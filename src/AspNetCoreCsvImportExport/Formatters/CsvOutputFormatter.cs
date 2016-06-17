@@ -59,10 +59,6 @@ namespace AspNetCoreCsvImportExport.Formatters
 
         private void writeStream(Type type, object value, Stream stream)
         {
-
-            //NOTE: We have check the type inside CanWriteType method
-            //If request comes this far, the type is IEnumerable. We are safe.
-
             Type itemType = type.GetGenericArguments()[0];
 
             StringWriter _stringWriter = new StringWriter();
