@@ -49,7 +49,7 @@ namespace AspNetCoreCsvImportExport.Formatters
 
         private object readStream(Type type, Stream stream)
         {
-            // We only proocess IList item at present and simple model type with properties
+            // We only proocess an IList item at present and simple model type with properties
             IList list = (IList)Activator.CreateInstance(type);
 
             var reader = new StreamReader(stream);
