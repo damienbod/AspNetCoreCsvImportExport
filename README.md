@@ -99,7 +99,7 @@ namespace AspNetCoreCsvImportExport.Controllers
 
 ```
 
-The csv input formatter implements the InputFormatter class. This checks if the context ModelType property is a type of IList and if so, converts the csv data to a List of Object of type T using reflection. This is implemented in the readstream method. The implementation is very basic and will not work if you have more complex structures in your model class.
+The csv input formatter implements the InputFormatter class. This checks if the context ModelType property is a type of IList and if so, converts the csv data to a List of Objects of type T using reflection. This is implemented in the read stream method. The implementation is very basic and will not work if you have more complex structures in your model class.
 
  
 ```csharp
@@ -190,7 +190,7 @@ namespace AspNetCoreCsvImportExport.Formatters
 
 ```
 
-The csv output formatter is implemented using the code from <a href="http://www.tugberkugurlu.com/archive/creating-custom-csvmediatypeformatter-in-asp-net-web-api-for-comma-separated-values-csv-format">Tugberk Ugurlu's blog</a> ans some small adaptions are made. Thanks for this. This formatter uses ';' to separate the properties and a new line for each object. The headers are added tot he first line.
+The csv output formatter is implemented using the code from <a href="http://www.tugberkugurlu.com/archive/creating-custom-csvmediatypeformatter-in-asp-net-web-api-for-comma-separated-values-csv-format">Tugberk Ugurlu's blog</a> with some small changes. Thanks for this. This formatter uses ';' to separate the properties and a new line for each object. The headers are added tot he first line.
 
 
 ```csharp
@@ -359,7 +359,7 @@ This data can then be used to upload the csv data to the server which is then co
 
 ```
 
-The following image so that the data is imported correctly.
+The following image shows that the data is imported correctly.
 
 
 <img src="https://damienbod.files.wordpress.com/2016/06/importexportcsv.png" alt="importExportCsv" width="598" height="558" class="alignnone size-full wp-image-6742" />
