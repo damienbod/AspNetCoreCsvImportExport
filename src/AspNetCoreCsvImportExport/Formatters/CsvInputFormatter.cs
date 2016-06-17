@@ -42,7 +42,7 @@ namespace AspNetCoreCsvImportExport.Formatters
             foreach (Type interfaceType in type.GetInterfaces())
             {
 
-                if (interfaceType == typeof(IEnumerable))
+                if (interfaceType == typeof(IList))
                     return true;
             }
 
@@ -51,7 +51,7 @@ namespace AspNetCoreCsvImportExport.Formatters
 
         private object readStream(Type type, Stream stream)
         {
-            // We only proocess IList item at present
+            // We only proocess IList item at present and simple model type with properties
             IList list = (IList)Activator.CreateInstance(type);
 
             var reader = new StreamReader(stream);
@@ -69,9 +69,10 @@ namespace AspNetCoreCsvImportExport.Formatters
                 {
                     var itemTypeInGeneric = list.GetType().GetTypeInfo().GenericTypeArguments[0];
                     var item = Activator.CreateInstance(itemTypeInGeneric);
-                    foreach(var value in values)
+                    var properties = item.GetType().GetProperties();
+                    for (int i = 0;i<values.Length; i++)
                     {
-                        // TODO read properties
+                        properties[i].SetValue(item, Convert.ChangeType(values[i], properties[i].PropertyType), null);
                     }
 
                     list.Add(item);
