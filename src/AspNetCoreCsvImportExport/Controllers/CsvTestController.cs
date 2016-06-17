@@ -49,35 +49,6 @@ namespace AspNetCoreCsvImportExport.Controllers
             return model;
         }
 
-        // GET api/csvtest/5
-        [HttpGet("{id}")]
-        public LocalizationRecord Get(int id)
-        {
-            return new LocalizationRecord
-            {
-                Id = id,
-                Key = "test",
-                Text = "test text",
-                LocalizationCulture = "en-US",
-                ResourceKey = "test"
-            };
-        }
-
-        // POST api/csvtest
-        [HttpPost]
-        public IActionResult Post([FromBody]LocalizationRecord value)
-        {
-            if(!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            else
-            {
-                LocalizationRecord data = value;
-                return Created("http://localhost:5000/api/csvtest", data);
-            }
-        }
-
         // POST api/csvtest/import
         [HttpPost]
         [Route("import")]

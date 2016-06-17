@@ -5,24 +5,29 @@
     <title>Csv import, export</title>
 </head>
 <body>
+    <br /> ASP.NET Core export using csv media output formatter
+
     <ul>
-        <li><a href="http://localhost:10336/api/csvtest/data.csv">Download CSV file: http://localhost:10336/api/csvtest/data.csv/a></li>
+        <li><a href="http://localhost:10336/api/csvtest/data.csv">Download CSV file: http://localhost:10336/api/csvtest/data.csv</li>
 
         <li><a href="http://localhost:10336/api/csvtest">GET Data using ACCEPT Header: http://localhost:10336/api/csvtest</a></li>
     </ul>
      
+    <br /> ASP.NET Core import using csv media input formatter
+    <br /><em>Send a HTTP POST request using Fiddler, postman or curl</em> 
+    <br />
+    <br/> http://localhost:10336/api/csvtest/import
+    <br />
+    <br /> User-Agent: Fiddler
+    <br /> Content-Type: text/csv
+    <br /> Host: localhost:10336
+    <br /> Content-Length: 110
+    <br />
+    <br />
+    <br /> Id;Key;Text;LocalizationCulture;ResourceKey
+    <br /> 1;test;test text;en-US;test
+    <br /> 2;test;test2 text de-CH;de-CH;test
 
-    http://localhost:10336/api/csvtest/import
-
-    User-Agent: Fiddler
-    Content-Type: text/csv
-    Host: localhost:10336
-    Content-Length: 110
-
-
-    Id,Key,Text,LocalizationCulture,ResourceKey
-    1,test,test text,en-US,test
-    2,test,test2 text de-CH,de-CH,test
 
 
 </body>
