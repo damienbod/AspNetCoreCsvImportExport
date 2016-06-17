@@ -7,9 +7,13 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Formatters;
 
-// http://www.tugberkugurlu.com/archive/creating-custom-csvmediatypeformatter-in-asp-net-web-api-for-comma-separated-values-csv-format
 namespace AspNetCoreCsvImportExport.Formatters
 {
+    /// <summary>
+    /// Original code taken from
+    /// http://www.tugberkugurlu.com/archive/creating-custom-csvmediatypeformatter-in-asp-net-web-api-for-comma-separated-values-csv-format
+    /// Adapted for ASP.NET Core and uses ; instead of , for delimiters
+    /// </summary>
     public class CsvOutputFormatter :  OutputFormatter
     {
         public string ContentType { get; private set; }
@@ -65,7 +69,7 @@ namespace AspNetCoreCsvImportExport.Formatters
 
             _stringWriter.WriteLine(
                 string.Join<string>(
-                    ",", itemType.GetProperties().Select(x => x.Name)
+                    ";", itemType.GetProperties().Select(x => x.Name)
                 )
             );
 
@@ -98,17 +102,17 @@ namespace AspNetCoreCsvImportExport.Formatters
                         if (_val.Contains("\n"))
                             _val = _val.Replace("\n", " ");
 
-                        _valueLine = string.Concat(_valueLine, _val, ",");
+                        _valueLine = string.Concat(_valueLine, _val, ";");
 
                     }
                     else
                     {
 
-                        _valueLine = string.Concat(string.Empty, ",");
+                        _valueLine = string.Concat(string.Empty, ";");
                     }
                 }
 
-                _stringWriter.WriteLine(_valueLine.TrimEnd(','));
+                _stringWriter.WriteLine(_valueLine.TrimEnd(';'));
             }
 
             var streamWriter = new StreamWriter(stream);

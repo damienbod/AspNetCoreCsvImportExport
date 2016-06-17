@@ -53,7 +53,24 @@ namespace AspNetCoreCsvImportExport.Formatters
         {
             var list = Activator.CreateInstance(type);
 
-            // TODO Add items from stream
+            var reader = new StreamReader(stream);
+
+            bool skipFirstLine = true;
+            while (!reader.EndOfStream)
+            {
+                var line = reader.ReadLine();
+                var values = line.Split(';');
+                if(skipFirstLine)
+                {
+                    skipFirstLine = false;
+                }
+                else
+                {
+                    // Start reading items!
+                }
+
+            }
+
             return list;
         }
     }
