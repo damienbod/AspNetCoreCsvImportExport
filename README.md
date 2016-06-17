@@ -24,7 +24,7 @@ namespace AspNetCoreCsvImportExport.Model
 
 The MVC Controller CsvTestController  makes it possible to import and export the data. The Get method exports the data using the Accept header in the HTTP Request. Per default, Json will be returned. If the Accept Header is set to 'text/csv', the data will be returned as csv. The GetDataAsCsv method always returns csv data because the Produces attribute is used to force this. This makes it easy the download csv data in a browser. 
 
-The Import method uses the Content-Type HTTP Request header to decide how to handle the request body. If the text/csv' is defined, the custom csv input formatter will be used.
+The Import method uses the Content-Type HTTP Request header to decide how to handle the request body. If the 'text/csv' is defined, the custom csv input formatter will be used.
 
 ```csharp
 using System.Collections.Generic;
@@ -99,7 +99,8 @@ namespace AspNetCoreCsvImportExport.Controllers
 
 ```
 
-The csv input formatter implements the InputFormatter class. This checks if the ModelType is a type of IList and if so converts the csv data to a List of Object of type T using reflection. This is implemented in the read stream method. The implementation is very basic and will not work if you have more complex structures in your model class.
+The csv input formatter implements the InputFormatter class. This checks if the context ModelType property is a type of IList and if so, converts the csv data to a List of Object of type T using reflection. This is implemented in the readstream method. The implementation is very basic and will not work if you have more complex structures in your model class.
+
  
 ```csharp
 using System;
@@ -189,10 +190,8 @@ namespace AspNetCoreCsvImportExport.Formatters
 
 ```
 
-```csharp
-```
+The csv output formatter is implemented using the code from <a href="http://www.tugberkugurlu.com/archive/creating-custom-csvmediatypeformatter-in-asp-net-web-api-for-comma-separated-values-csv-format">Tugberk Ugurlu's blog</a> ans some small adaptions are made. Thanks for this. This formatter uses ';' to separate the properties and a new line for each object. The headers are added tot he first line.
 
-The csv output formatter is implemented using the code from <a href="http://www.tugberkugurlu.com/archive/creating-custom-csvmediatypeformatter-in-asp-net-web-api-for-comma-separated-values-csv-format">Tugberk Ugurlu's blog</a>. Thanks for this. This formatter uses ';' to separate the properties and a new line for each object. The headers are added tot he first line.
 
 ```csharp
 using System;
@@ -317,7 +316,8 @@ namespace AspNetCoreCsvImportExport.Formatters
 
 ```
 
-The custom formatters need to be added to the MVC middleware so that it knows how to handle media types text/csv. 
+The custom formatters need to be added to the MVC middleware, so that it knows how to handle media types 'text/csv'. 
+
 
 ```csharp
 public void ConfigureServices(IServiceCollection services)
@@ -331,7 +331,7 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
-When the data.csv link is requested, the browser a csv type response is returned which can be saved to the file system. This data contains the header texts and the value of each property in each object. This can then be opened in excel.
+When the data.csv link is requested, a csv type response is returned to the client, which can be saved. This data contains the header texts and the value of each property in each object. This can then be opened in excel.
 
 http://localhost:10336/api/csvtest/data.csv
 
@@ -341,7 +341,7 @@ Id;Key;Text;LocalizationCulture;ResourceKey
 2;test;test2 text de-CH;de-CH;test
 ```
 
-This data can then be use to upload the csv data to the server which is then converted back to a C# object. I use fiddler, postman or curl can also be used, or any HTTP Client where you can set the header Content-Type.
+This data can then be used to upload the csv data to the server which is then converted back to a C# object. I use fiddler, postman or curl can also be used, or any HTTP Client where you can set the header Content-Type.
 
 ```csharp
 
@@ -359,13 +359,14 @@ This data can then be use to upload the csv data to the server which is then con
 
 ```
 
-You can see, that the data is correctly imported.
+The following image so that the data is imported correctly.
+
 
 <img src="https://damienbod.files.wordpress.com/2016/06/importexportcsv.png" alt="importExportCsv" width="598" height="558" class="alignnone size-full wp-image-6742" />
 
 <strong>Notes</strong>
 
-The implementation of the InputFormatter and the OutputFormatter classes are specific for a list of simple classes with only properties. If you required are used more complex classes, these implementations need to be changed.
+The implementation of the InputFormatter and the OutputFormatter classes are specific for a list of simple classes with only properties. If you require or use more complex classes, these implementations need to be changed.
 
 <strong>Links</strong>
 
