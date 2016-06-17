@@ -51,7 +51,8 @@ namespace AspNetCoreCsvImportExport.Formatters
 
         private object readStream(Type type, Stream stream)
         {
-            var list = Activator.CreateInstance(type);
+            // We only proocess IList item at present
+            IList list = (IList)Activator.CreateInstance(type);
 
             var reader = new StreamReader(stream);
 
@@ -66,7 +67,14 @@ namespace AspNetCoreCsvImportExport.Formatters
                 }
                 else
                 {
-                    // Start reading items!
+                    var itemTypeInGeneric = list.GetType().GetTypeInfo().GenericTypeArguments[0];
+                    var item = Activator.CreateInstance(itemTypeInGeneric);
+                    foreach(var value in values)
+                    {
+                        // TODO read properties
+                    }
+
+                    list.Add(item);
                 }
 
             }
