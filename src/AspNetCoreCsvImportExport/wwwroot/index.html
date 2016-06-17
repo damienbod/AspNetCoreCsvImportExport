@@ -1,0 +1,29 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Csv import, export</title>
+</head>
+<body>
+    <ul>
+        <li><a href="http://localhost:10336/api/csvtest/data.csv">Download CSV file: http://localhost:10336/api/csvtest/data.csv/a></li>
+
+        <li><a href="http://localhost:10336/api/csvtest">GET Data using ACCEPT Header: http://localhost:10336/api/csvtest</a></li>
+    </ul>
+     
+
+    http://localhost:10336/api/csvtest/import
+
+    User-Agent: Fiddler
+    Content-Type: text/csv
+    Host: localhost:10336
+    Content-Length: 110
+
+
+    Id,Key,Text,LocalizationCulture,ResourceKey
+    1,test,test text,en-US,test
+    2,test,test2 text de-CH,de-CH,test
+
+
+</body>
+</html>
