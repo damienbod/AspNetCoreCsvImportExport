@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -13,6 +14,18 @@ namespace AspNetCoreCsvImportExport.Formatters
     /// </summary>
     public class CsvInputFormatter : InputFormatter
     {
+        private readonly CsvFormatterOptions _options;
+
+        public CsvInputFormatter(CsvFormatterOptions csvFormatterOptions)
+        {
+            if (csvFormatterOptions == null)
+            {
+                throw new ArgumentNullException(nameof(csvFormatterOptions));
+            }
+
+            _options = csvFormatterOptions;
+        }
+
         public override Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context)
         {
             var type = context.ModelType;
@@ -49,16 +62,33 @@ namespace AspNetCoreCsvImportExport.Formatters
 
         private object readStream(Type type, Stream stream)
         {
-            // We only proocess an IList item at present and simple model type with properties
-            IList list = (IList)Activator.CreateInstance(type);
+            Type itemType;
+            var typeIsArray = false;
+            IList list;
+            if (type.GetGenericArguments().Length > 0)
+            {
+                itemType = type.GetGenericArguments()[0];
+                list = (IList)Activator.CreateInstance(itemType);
+            }
+            else
+            {
+                typeIsArray = true;
+                itemType = type.GetElementType();
+
+                var listType = typeof(List<>);
+                var constructedListType = listType.MakeGenericType(itemType);
+
+                list = (IList)Activator.CreateInstance(constructedListType);
+            }
+
 
             var reader = new StreamReader(stream);
 
-            bool skipFirstLine = true;
+            bool skipFirstLine = _options.UseSingleLineHeaderInCsv;
             while (!reader.EndOfStream)
             {
                 var line = reader.ReadLine();
-                var values = line.Split(';');
+                var values = line.Split(_options.CsvDelimiter.ToCharArray());
                 if(skipFirstLine)
                 {
                     skipFirstLine = false;
@@ -78,6 +108,17 @@ namespace AspNetCoreCsvImportExport.Formatters
 
             }
 
+            if(typeIsArray)
+            {
+                Array array = Array.CreateInstance(itemType, list.Count);
+
+                for(int t = 0; t < list.Count; t++)
+                {
+                    array.SetValue(list[t], t);
+                }
+                return array;
+            }
+            
             return list;
         }
     }

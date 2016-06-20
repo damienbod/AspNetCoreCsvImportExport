@@ -16,12 +16,21 @@ namespace AspNetCoreCsvImportExport.Formatters
     /// </summary>
     public class CsvOutputFormatter :  OutputFormatter
     {
+        private readonly CsvFormatterOptions _options;
+
         public string ContentType { get; private set; }
 
-        public CsvOutputFormatter()
+        public CsvOutputFormatter(CsvFormatterOptions csvFormatterOptions)
         {
             ContentType = "text/csv";
             SupportedMediaTypes.Add(Microsoft.Net.Http.Headers.MediaTypeHeaderValue.Parse("text/csv"));
+
+            if (csvFormatterOptions == null)
+            {
+                throw new ArgumentNullException(nameof(csvFormatterOptions));
+            }
+
+            _options = csvFormatterOptions;
 
             //SupportedEncodings.Add(Encoding.GetEncoding("utf-8"));
         }
@@ -41,35 +50,42 @@ namespace AspNetCoreCsvImportExport.Formatters
             foreach (Type interfaceType in type.GetInterfaces())
             {
 
-                if (interfaceType == typeof(IEnumerable))
+                if (interfaceType == typeof(IList))
                     return true;
             }
 
             return false;
         }
 
-        public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
+        public async override Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
         {
             var response = context.HttpContext.Response;
 
             Type type = context.Object.GetType();
-            writeStream(type, context.Object, response.Body);
-            return Task.FromResult(response);
-        }
+            Type itemType;
 
-        private void writeStream(Type type, object value, Stream stream)
-        {
-            Type itemType = type.GetGenericArguments()[0];
+            if (type.GetGenericArguments().Length > 0)
+            {
+                itemType = type.GetGenericArguments()[0];
+            }
+            else
+            {
+                itemType = type.GetElementType();
+            }
 
             StringWriter _stringWriter = new StringWriter();
 
-            _stringWriter.WriteLine(
-                string.Join<string>(
-                    ";", itemType.GetProperties().Select(x => x.Name)
-                )
-            );
+            if (_options.UseSingleLineHeaderInCsv)
+            {
+                _stringWriter.WriteLine(
+                    string.Join<string>(
+                        _options.CsvDelimiter, itemType.GetProperties().Select(x => x.Name)
+                    )
+                );
+            }
 
-            foreach (var obj in (IEnumerable<object>)value)
+
+            foreach (var obj in (IEnumerable<object>)context.Object)
             {
 
                 var vals = obj.GetType().GetProperties().Select(
@@ -98,22 +114,22 @@ namespace AspNetCoreCsvImportExport.Formatters
                         if (_val.Contains("\n"))
                             _val = _val.Replace("\n", " ");
 
-                        _valueLine = string.Concat(_valueLine, _val, ";");
+                        _valueLine = string.Concat(_valueLine, _val, _options.CsvDelimiter);
 
                     }
                     else
                     {
 
-                        _valueLine = string.Concat(string.Empty, ";");
+                        _valueLine = string.Concat(string.Empty, _options.CsvDelimiter);
                     }
                 }
 
-                _stringWriter.WriteLine(_valueLine.TrimEnd(';'));
+                _stringWriter.WriteLine(_valueLine.TrimEnd(_options.CsvDelimiter.ToCharArray()));
             }
 
-            var streamWriter = new StreamWriter(stream);
-            streamWriter.Write(_stringWriter.ToString());
-            streamWriter.Flush();
+            var streamWriter = new StreamWriter(response.Body);
+            await streamWriter.WriteAsync(_stringWriter.ToString());
+            await streamWriter.FlushAsync();
         }
     }
 }
