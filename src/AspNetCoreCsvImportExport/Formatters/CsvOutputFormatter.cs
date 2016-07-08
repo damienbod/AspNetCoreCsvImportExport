@@ -120,7 +120,7 @@ namespace AspNetCoreCsvImportExport.Formatters
                     else
                     {
 
-                        _valueLine = string.Concat(string.Empty, _options.CsvDelimiter);
+                        _valueLine = string.Concat(_valueLine, string.Empty, _options.CsvDelimiter);
                     }
                 }
 
