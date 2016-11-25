@@ -4,6 +4,7 @@ This article shows how to import and export csv data in an ASP.NET Core applicat
 
 <strong>Code: </strong> https://github.com/damienbod/AspNetCoreCsvImportExport
 
+<strong>2016.11.25strong> Updated ASP.NET Core 1.1
 <strong>2016.06.29:</strong> Updated to ASP.NET Core RTM
 
 The LocalizationRecord class is used as the model class to import and export to and from csv data.
