@@ -65,5 +65,22 @@ namespace AspNetCoreCsvImportExport.Controllers
             }
         }
 
+        // POST api/csvtest/import
+        [HttpPost]
+        [Route("importCustomerPlanModel")]
+        public IActionResult ImportCustomerPlanModel([FromBody]List<CustomerPlanModel> value)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            else
+            {
+                List<CustomerPlanModel> data = value;
+                return Ok();
+            }
+        }
+        
+
     }
 }

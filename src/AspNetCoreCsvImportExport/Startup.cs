@@ -26,6 +26,7 @@ namespace AspNetCoreCsvImportExport
         public void ConfigureServices(IServiceCollection services)
         {
             var csvFormatterOptions = new CsvFormatterOptions();
+            csvFormatterOptions.CsvDelimiter = ",";
 
             services.AddMvc(options =>
             {
