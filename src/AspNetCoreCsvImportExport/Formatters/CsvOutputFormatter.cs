@@ -84,13 +84,12 @@ namespace AspNetCoreCsvImportExport.Formatters
                 );
             }
 
-
             foreach (var obj in (IEnumerable<object>)context.Object)
             {
 
                 var vals = obj.GetType().GetProperties().Select(
                     pi => new {
-                        Value = pi.GetValue(obj, null)
+                        Value = pi.GetValue(obj)
                     }
                 );
 
@@ -119,7 +118,6 @@ namespace AspNetCoreCsvImportExport.Formatters
                     }
                     else
                     {
-
                         _valueLine = string.Concat(_valueLine, string.Empty, _options.CsvDelimiter);
                     }
                 }
