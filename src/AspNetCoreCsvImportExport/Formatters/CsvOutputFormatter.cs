@@ -14,7 +14,7 @@ namespace AspNetCoreCsvImportExport.Formatters
     /// http://www.tugberkugurlu.com/archive/creating-custom-csvmediatypeformatter-in-asp-net-web-api-for-comma-separated-values-csv-format
     /// Adapted for ASP.NET Core and uses ; instead of , for delimiters
     /// </summary>
-    public class CsvOutputFormatter :  OutputFormatter
+    public class CsvOutputFormatter : OutputFormatter
     {
         private readonly CsvFormatterOptions _options;
 
@@ -41,10 +41,10 @@ namespace AspNetCoreCsvImportExport.Formatters
             if (type == null)
                 throw new ArgumentNullException("type");
 
-            return isTypeOfIEnumerable(type);
+            return IsTypeOfIEnumerable(type);
         }
 
-        private bool isTypeOfIEnumerable(Type type)
+        private bool IsTypeOfIEnumerable(Type type)
         {
 
             foreach (Type interfaceType in type.GetInterfaces())
@@ -84,12 +84,13 @@ namespace AspNetCoreCsvImportExport.Formatters
                 );
             }
 
+
             foreach (var obj in (IEnumerable<object>)context.Object)
             {
 
                 var vals = obj.GetType().GetProperties().Select(
                     pi => new {
-                        Value = pi.GetValue(obj)
+                        Value = pi.GetValue(obj, null)
                     }
                 );
 

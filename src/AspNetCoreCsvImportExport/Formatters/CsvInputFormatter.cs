@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Net.Http.Headers;
+using System.Text;
 
 namespace AspNetCoreCsvImportExport.Formatters
 {
@@ -18,6 +19,8 @@ namespace AspNetCoreCsvImportExport.Formatters
 
         public CsvInputFormatter(CsvFormatterOptions csvFormatterOptions)
         {
+            SupportedMediaTypes.Add(Microsoft.Net.Http.Headers.MediaTypeHeaderValue.Parse("text/csv"));
+
             if (csvFormatterOptions == null)
             {
                 throw new ArgumentNullException(nameof(csvFormatterOptions));
@@ -34,7 +37,7 @@ namespace AspNetCoreCsvImportExport.Formatters
             MediaTypeHeaderValue.TryParse(request.ContentType, out requestContentType);
 
 
-            var result = readStream(type, request.Body);
+            var result = ReadStream(type, request.Body);
             return InputFormatterResult.SuccessAsync(result);
         }
 
@@ -44,10 +47,10 @@ namespace AspNetCoreCsvImportExport.Formatters
             if (type == null)
                 throw new ArgumentNullException("type");
 
-            return isTypeOfIEnumerable(type);
+            return IsTypeOfIEnumerable(type);
         }
 
-        private bool isTypeOfIEnumerable(Type type)
+        private bool IsTypeOfIEnumerable(Type type)
         {
 
             foreach (Type interfaceType in type.GetInterfaces())
@@ -60,7 +63,7 @@ namespace AspNetCoreCsvImportExport.Formatters
             return false;
         }
 
-        private object readStream(Type type, Stream stream)
+        private object ReadStream(Type type, Stream stream)
         {
             Type itemType;
             var typeIsArray = false;
@@ -68,7 +71,7 @@ namespace AspNetCoreCsvImportExport.Formatters
             if (type.GetGenericArguments().Length > 0)
             {
                 itemType = type.GetGenericArguments()[0];
-                list = (IList)(Activator.CreateInstance(type));
+                list = (IList)Activator.CreateInstance(type);
             }
             else
             {
@@ -81,15 +84,14 @@ namespace AspNetCoreCsvImportExport.Formatters
                 list = (IList)Activator.CreateInstance(constructedListType);
             }
 
-
-            var reader = new StreamReader(stream);
+            var reader = new StreamReader(stream, Encoding.GetEncoding(_options.Encoding));
 
             bool skipFirstLine = _options.UseSingleLineHeaderInCsv;
             while (!reader.EndOfStream)
             {
                 var line = reader.ReadLine();
                 var values = line.Split(_options.CsvDelimiter.ToCharArray());
-                if(skipFirstLine)
+                if (skipFirstLine)
                 {
                     skipFirstLine = false;
                 }
@@ -98,7 +100,7 @@ namespace AspNetCoreCsvImportExport.Formatters
                     var itemTypeInGeneric = list.GetType().GetTypeInfo().GenericTypeArguments[0];
                     var item = Activator.CreateInstance(itemTypeInGeneric);
                     var properties = item.GetType().GetProperties();
-                    for (int i = 0;i<values.Length; i++)
+                    for (int i = 0; i < values.Length; i++)
                     {
                         properties[i].SetValue(item, Convert.ChangeType(values[i], properties[i].PropertyType), null);
                     }
@@ -108,17 +110,17 @@ namespace AspNetCoreCsvImportExport.Formatters
 
             }
 
-            if(typeIsArray)
+            if (typeIsArray)
             {
                 Array array = Array.CreateInstance(itemType, list.Count);
 
-                for(int t = 0; t < list.Count; t++)
+                for (int t = 0; t < list.Count; t++)
                 {
                     array.SetValue(list[t], t);
                 }
                 return array;
             }
-            
+
             return list;
         }
     }
