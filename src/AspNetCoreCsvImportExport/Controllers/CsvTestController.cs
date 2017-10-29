@@ -39,7 +39,7 @@ namespace AspNetCoreCsvImportExport.Controllers
                 {
                     Id = 2,
                     Key = "test",
-                    Text = "test2 text de-CH",
+                    Text = "test2 öäüéàè text de-CH",
                     LocalizationCulture = "de-CH",
                     ResourceKey = "test"
 
