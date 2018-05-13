@@ -91,7 +91,7 @@ namespace AspNetCoreCsvImportExport.Formatters
             {
                 var line = reader.ReadLine();
                 var values = line.Split(_options.CsvDelimiter.ToCharArray());
-                if (skipFirstLine)
+                if(skipFirstLine)
                 {
                     skipFirstLine = false;
                 }
@@ -100,7 +100,7 @@ namespace AspNetCoreCsvImportExport.Formatters
                     var itemTypeInGeneric = list.GetType().GetTypeInfo().GenericTypeArguments[0];
                     var item = Activator.CreateInstance(itemTypeInGeneric);
                     var properties = item.GetType().GetProperties();
-                    for (int i = 0; i < values.Length; i++)
+                    for (int i = 0;i<values.Length; i++)
                     {
                         properties[i].SetValue(item, Convert.ChangeType(values[i], properties[i].PropertyType), null);
                     }
@@ -110,17 +110,17 @@ namespace AspNetCoreCsvImportExport.Formatters
 
             }
 
-            if (typeIsArray)
+            if(typeIsArray)
             {
                 Array array = Array.CreateInstance(itemType, list.Count);
 
-                for (int t = 0; t < list.Count; t++)
+                for(int t = 0; t < list.Count; t++)
                 {
                     array.SetValue(list[t], t);
                 }
                 return array;
             }
-
+            
             return list;
         }
     }
