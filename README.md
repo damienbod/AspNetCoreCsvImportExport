@@ -209,7 +209,7 @@ namespace AspNetCoreCsvImportExport.Formatters
             {
                 var line = reader.ReadLine();
                 var values = line.Split(_options.CsvDelimiter.ToCharArray());
-                if (skipFirstLine)
+                if(skipFirstLine)
                 {
                     skipFirstLine = false;
                 }
@@ -218,7 +218,7 @@ namespace AspNetCoreCsvImportExport.Formatters
                     var itemTypeInGeneric = list.GetType().GetTypeInfo().GenericTypeArguments[0];
                     var item = Activator.CreateInstance(itemTypeInGeneric);
                     var properties = item.GetType().GetProperties();
-                    for (int i = 0; i < values.Length; i++)
+                    for (int i = 0;i<values.Length; i++)
                     {
                         properties[i].SetValue(item, Convert.ChangeType(values[i], properties[i].PropertyType), null);
                     }
@@ -228,22 +228,21 @@ namespace AspNetCoreCsvImportExport.Formatters
 
             }
 
-            if (typeIsArray)
+            if(typeIsArray)
             {
                 Array array = Array.CreateInstance(itemType, list.Count);
 
-                for (int t = 0; t < list.Count; t++)
+                for(int t = 0; t < list.Count; t++)
                 {
                     array.SetValue(list[t], t);
                 }
                 return array;
             }
-
+            
             return list;
         }
     }
 }
-
 ```
 
 The csv output formatter is implemented using the code from <a href="http://www.tugberkugurlu.com/archive/creating-custom-csvmediatypeformatter-in-asp-net-web-api-for-comma-separated-values-csv-format">Tugberk Ugurlu's blog</a> with some small changes. Thanks for this. This formatter uses ';' to separate the properties and a new line for each object. The headers are added tot he first line.
@@ -255,9 +254,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using System.ComponentModel.DataAnnotations;
 
 namespace AspNetCoreCsvImportExport.Formatters
 {
@@ -276,15 +277,7 @@ namespace AspNetCoreCsvImportExport.Formatters
         {
             ContentType = "text/csv";
             SupportedMediaTypes.Add(Microsoft.Net.Http.Headers.MediaTypeHeaderValue.Parse("text/csv"));
-
-            if (csvFormatterOptions == null)
-            {
-                throw new ArgumentNullException(nameof(csvFormatterOptions));
-            }
-
-            _options = csvFormatterOptions;
-
-            //SupportedEncodings.Add(Encoding.GetEncoding("utf-8"));
+            _options = csvFormatterOptions ?? throw new ArgumentNullException(nameof(csvFormatterOptions));
         }
 
         protected override bool CanWriteType(Type type)
@@ -325,32 +318,31 @@ namespace AspNetCoreCsvImportExport.Formatters
                 itemType = type.GetElementType();
             }
 
-            StringWriter _stringWriter = new StringWriter();
+            var streamWriter = new StreamWriter(response.Body, Encoding.GetEncoding(_options.Encoding));
 
             if (_options.UseSingleLineHeaderInCsv)
             {
-                _stringWriter.WriteLine(
-                    string.Join<string>(
-                        _options.CsvDelimiter, itemType.GetProperties().Select(x => x.Name)
+                await streamWriter.WriteLineAsync(
+                    string.Join(
+                        _options.CsvDelimiter, itemType.GetProperties().Select(x => x.GetCustomAttribute<DisplayAttribute>(false)?.Name ?? x.Name)
                     )
                 );
             }
-
 
             foreach (var obj in (IEnumerable<object>)context.Object)
             {
 
                 var vals = obj.GetType().GetProperties().Select(
-                    pi => new {
+                    pi => new
+                    {
                         Value = pi.GetValue(obj, null)
                     }
                 );
 
-                string _valueLine = string.Empty;
+                string valueLine = string.Empty;
 
                 foreach (var val in vals)
                 {
-
                     if (val.Value != null)
                     {
 
@@ -366,20 +358,18 @@ namespace AspNetCoreCsvImportExport.Formatters
                         if (_val.Contains("\n"))
                             _val = _val.Replace("\n", " ");
 
-                        _valueLine = string.Concat(_valueLine, _val, _options.CsvDelimiter);
+                        valueLine = string.Concat(valueLine, _val, _options.CsvDelimiter);
 
                     }
                     else
                     {
-                        _valueLine = string.Concat(_valueLine, string.Empty, _options.CsvDelimiter);
+                        valueLine = string.Concat(valueLine, string.Empty, _options.CsvDelimiter);
                     }
                 }
 
-                _stringWriter.WriteLine(_valueLine.TrimEnd(_options.CsvDelimiter.ToCharArray()));
+                await streamWriter.WriteLineAsync(valueLine.TrimEnd(_options.CsvDelimiter.ToCharArray()));
             }
 
-            var streamWriter = new StreamWriter(response.Body);
-            await streamWriter.WriteAsync(_stringWriter.ToString());
             await streamWriter.FlushAsync();
         }
     }
