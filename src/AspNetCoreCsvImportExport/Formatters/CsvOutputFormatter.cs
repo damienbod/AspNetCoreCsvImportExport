@@ -51,6 +51,21 @@ namespace AspNetCoreCsvImportExport.Formatters
 
             return false;
         }
+        
+        /// <summary>
+        /// Returns the JsonProperty data annotation name
+        /// </summary>
+        /// <param name="pi">Property Info</param>
+        /// <returns></returns>
+        private string GetDisplayNameFromNewtonsoftJsonAnnotations(PropertyInfo pi)
+        {
+            if (pi.GetCustomAttribute<JsonPropertyAttribute>(false)?.PropertyName is string value)
+            {
+                return value;
+            }
+
+            return pi.GetCustomAttribute<DisplayAttribute>(false)?.Name ?? pi.Name;
+        }
 
         public async override Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
         {
