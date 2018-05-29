@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 
 namespace AspNetCoreCsvImportExport.Formatters
 {
@@ -69,24 +70,34 @@ namespace AspNetCoreCsvImportExport.Formatters
 
             var streamWriter = new StreamWriter(response.Body, Encoding.GetEncoding(_options.Encoding));
 
+
             if (_options.UseSingleLineHeaderInCsv)
             {
-                await streamWriter.WriteLineAsync(
-                    string.Join(
-                        _options.CsvDelimiter, itemType.GetProperties().Select(x => x.GetCustomAttribute<DisplayAttribute>(false)?.Name ?? x.Name)
-                    )
-                );
+                var values = _options.UseNewtonsoftJsonDataAnnotations
+                    ? itemType.GetProperties().Where(pi => !pi.GetCustomAttributes<JsonIgnoreAttribute>(false).Any())    // Only get the properties that do not define JsonIgnore
+                        .Select(GetDisplayNameFromNewtonsoftJsonAnnotations)  // Transformed to method group as shown left. Was => .Select(pi => GetDisplayName(pi));
+                    : itemType.GetProperties().Select(pi => pi.GetCustomAttribute<DisplayAttribute>(false)?.Name ?? pi.Name);
+
+                await streamWriter.WriteLineAsync(string.Join(_options.CsvDelimiter, values));
             }
+
 
             foreach (var obj in (IEnumerable<object>)context.Object)
             {
 
-                var vals = obj.GetType().GetProperties().Select(
-                    pi => new
-                    {
-                        Value = pi.GetValue(obj, null)
-                    }
-                );
+                //IEnumerable<ObjectValue> vals;
+                var vals = _options.UseNewtonsoftJsonDataAnnotations
+                    ? obj.GetType().GetProperties()
+                        .Where(pi => !pi.GetCustomAttributes<JsonIgnoreAttribute>().Any())
+                        .Select(pi => new
+                        {
+                            Value = pi.GetValue(obj, null)
+                        })
+                    : obj.GetType().GetProperties().Select(
+                        pi => new
+                        {
+                            Value = pi.GetValue(obj, null)
+                        });
 
                 string valueLine = string.Empty;
 
@@ -97,7 +108,7 @@ namespace AspNetCoreCsvImportExport.Formatters
 
                         var _val = val.Value.ToString();
 
-                        //Check if the value contans a comma and place it in quotes if so
+                        //Check if the value contains a comma and place it in quotes if so
                         if (_val.Contains(","))
                             _val = string.Concat("\"", _val, "\"");
 
