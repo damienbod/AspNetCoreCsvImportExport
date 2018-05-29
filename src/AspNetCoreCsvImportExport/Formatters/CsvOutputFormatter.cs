@@ -75,7 +75,7 @@ namespace AspNetCoreCsvImportExport.Formatters
             {
                 var values = _options.UseNewtonsoftJsonDataAnnotations
                     ? itemType.GetProperties().Where(pi => !pi.GetCustomAttributes<JsonIgnoreAttribute>(false).Any())    // Only get the properties that do not define JsonIgnore
-                        .Select(GetDisplayNameFromNewtonsoftJsonAnnotations)  // Transformed to method group as shown left. Was => .Select(pi => GetDisplayName(pi));
+                        .Select(GetDisplayNameFromNewtonsoftJsonAnnotations)
                     : itemType.GetProperties().Select(pi => pi.GetCustomAttribute<DisplayAttribute>(false)?.Name ?? pi.Name);
 
                 await streamWriter.WriteLineAsync(string.Join(_options.CsvDelimiter, values));
