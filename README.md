@@ -4,6 +4,8 @@ This article shows how to import and export csv data in an ASP.NET Core applicat
 
 <strong>Code: </strong> https://github.com/damienbod/AspNetCoreCsvImportExport
 
+<strong>2018-07-09: </strong> Updated to .NET Core 2.1.1
+
 <strong>2018-05-31: </strong> Support for ignore, Updated to .NET Core 2.1
 
 <strong>2018-05-13: </strong> Updated to .NET Core 2.1 rc
