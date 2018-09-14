@@ -28,8 +28,6 @@ namespace AspNetCoreCsvImportExport
         {
             var csvFormatterOptions = new CsvFormatterOptions();
             csvFormatterOptions.CsvDelimiter = "|";
-            // You can ignore properties by using this configuration
-            // csvFormatterOptions.UseNewtonsoftJsonDataAnnotations = true;
 
             services.AddMvc(options =>
             {
