@@ -21,6 +21,8 @@ namespace AspNetCoreCsvImportExport.Formatters
     {
         private readonly CsvFormatterOptions _options;
 
+        private readonly bool useJsonAttributes = true;
+
         public string ContentType { get; private set; }
 
         public CsvOutputFormatter(CsvFormatterOptions csvFormatterOptions)
@@ -85,10 +87,14 @@ namespace AspNetCoreCsvImportExport.Formatters
 
             var streamWriter = new StreamWriter(response.Body, Encoding.GetEncoding(_options.Encoding));
 
+            if (_options.IncludeExcelDelimiterHeader)
+            {
+                await streamWriter.WriteLineAsync($"sep ={_options.CsvDelimiter}");
+            }
 
             if (_options.UseSingleLineHeaderInCsv)
             {
-                var values = _options.UseNewtonsoftJsonDataAnnotations
+                var values = useJsonAttributes
                     ? itemType.GetProperties().Where(pi => !pi.GetCustomAttributes<JsonIgnoreAttribute>(false).Any())    // Only get the properties that do not define JsonIgnore
                         .Select(GetDisplayNameFromNewtonsoftJsonAnnotations)
                     : itemType.GetProperties().Select(pi => pi.GetCustomAttribute<DisplayAttribute>(false)?.Name ?? pi.Name);
@@ -99,9 +105,7 @@ namespace AspNetCoreCsvImportExport.Formatters
 
             foreach (var obj in (IEnumerable<object>)context.Object)
             {
-
-                //IEnumerable<ObjectValue> vals;
-                var vals = _options.UseNewtonsoftJsonDataAnnotations
+                var vals = useJsonAttributes
                     ? obj.GetType().GetProperties()
                         .Where(pi => !pi.GetCustomAttributes<JsonIgnoreAttribute>().Any())
                         .Select(pi => new
@@ -123,8 +127,11 @@ namespace AspNetCoreCsvImportExport.Formatters
 
                         var _val = val.Value.ToString();
 
-                        //Check if the value contains a comma and place it in quotes if so
-                        if (_val.Contains(","))
+                        //Escape quotas
+                        _val = _val.Replace("\"", "\"\"");
+
+                        //Check if the value contans a delimiter and place it in quotes if so
+                        if (_val.Contains(_options.CsvDelimiter))
                             _val = string.Concat("\"", _val, "\"");
 
                         //Replace any \r or \n special characters from a new line with a space
