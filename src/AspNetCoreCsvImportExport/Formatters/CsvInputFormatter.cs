@@ -19,6 +19,8 @@ namespace AspNetCoreCsvImportExport.Formatters
     {
         private readonly CsvFormatterOptions _options;
 
+        private readonly bool useJsonAttributes = true;
+
         public CsvInputFormatter(CsvFormatterOptions csvFormatterOptions)
         {
             SupportedMediaTypes.Add(Microsoft.Net.Http.Headers.MediaTypeHeaderValue.Parse("text/csv"));
@@ -43,9 +45,8 @@ namespace AspNetCoreCsvImportExport.Formatters
             return InputFormatterResult.SuccessAsync(result);
         }
 
-        public override bool CanRead(InputFormatterContext context)
+        protected override bool CanReadType(Type type)
         {
-            var type = context.ModelType;
             if (type == null)
                 throw new ArgumentNullException("type");
 
@@ -101,10 +102,10 @@ namespace AspNetCoreCsvImportExport.Formatters
                 {
                     var itemTypeInGeneric = list.GetType().GetTypeInfo().GenericTypeArguments[0];
                     var item = Activator.CreateInstance(itemTypeInGeneric);
-                    var properties = _options.UseNewtonsoftJsonDataAnnotations
+                    var properties = useJsonAttributes
                         ? item.GetType().GetProperties().Where(pi => !pi.GetCustomAttributes<JsonIgnoreAttribute>().Any()).ToArray()
                         : item.GetType().GetProperties();
-                    // TODO: Maybe refactor to not use positional mapping?, mapping by index could generate errors pretty easily :)
+
                     for (int i = 0; i < values.Length; i++)
                     {
                         properties[i].SetValue(item, Convert.ChangeType(values[i], properties[i].PropertyType), null);
@@ -125,7 +126,7 @@ namespace AspNetCoreCsvImportExport.Formatters
                 }
                 return array;
             }
-            
+
             return list;
         }
     }
