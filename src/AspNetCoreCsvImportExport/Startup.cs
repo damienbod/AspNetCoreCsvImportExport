@@ -29,6 +29,11 @@ namespace AspNetCoreCsvImportExport
             var csvFormatterOptions = new CsvFormatterOptions();
             csvFormatterOptions.CsvDelimiter = "|";
 
+			services.AddResponseCompression(options => 
+            {
+                options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "text/csv" });
+            });
+
             services.AddMvc(options =>
             {
                 options.InputFormatters.Add(new CsvInputFormatter(csvFormatterOptions));
