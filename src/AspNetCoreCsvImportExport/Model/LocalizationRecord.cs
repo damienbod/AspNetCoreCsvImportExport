@@ -5,8 +5,8 @@ namespace AspNetCoreCsvImportExport.Model
 {
     public class LocalizationRecord
     {
-        [JsonIgnore]
-        public long? Id { get; set; }
+        //[JsonIgnore]
+        public long Id { get; set; }
 
         [JsonProperty(PropertyName = "CustomKeyName")]
         public string Key { get; set; }

@@ -43,6 +43,15 @@ namespace AspNetCoreCsvImportExport.Controllers
                     LocalizationCulture = "de-CH",
                     ResourceKey = "test"
 
+                },
+                new LocalizationRecord
+                {
+                    Id = 3,
+                    Key = "test3",
+                    Text = "test2 öäüéàè text de-CH, it-CH, en-US",
+                    LocalizationCulture = "de-CH",
+                    ResourceKey = "test"
+
                 }
             };
 
