@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
+using System.Linq;
 
 namespace AspNetCoreCsvImportExport
 {
@@ -29,7 +31,7 @@ namespace AspNetCoreCsvImportExport
             var csvFormatterOptions = new CsvFormatterOptions();
             csvFormatterOptions.CsvDelimiter = "|";
 
-			services.AddResponseCompression(options => 
+            services.AddResponseCompression(options => 
             {
                 options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "text/csv" });
             });
