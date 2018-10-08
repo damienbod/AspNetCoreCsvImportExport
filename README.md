@@ -5,6 +5,8 @@ You can download [this package](https://www.nuget.org/packages/WebApiContrib.Cor
 ## About
 This article shows how to import and export csv data in an ASP.NET Core application. The InputFormatter and the OutputFormatter classes are used to convert the csv data to the C# model classes. 
 
+<strong>2018-10-08: </strong> Updated to .NET Core 2.1.5, adding compression
+
 <strong>2018-09-14: </strong> Updated to .NET Core 2.1.4
 
 <strong>2018-07-09: </strong> Updated to .NET Core 2.1.1
