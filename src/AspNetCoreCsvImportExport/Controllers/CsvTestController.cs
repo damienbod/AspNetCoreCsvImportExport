@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 using AspNetCoreCsvImportExport.Model;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,6 +10,7 @@ namespace AspNetCoreCsvImportExport.Controllers
     {
         // GET api/csvtest
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<LocalizationRecord>), (int)HttpStatusCode.OK)]
         public IActionResult Get()
         {
             return Ok(DummyDataSimple());
