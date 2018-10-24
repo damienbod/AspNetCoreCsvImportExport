@@ -11,7 +11,7 @@ namespace AspNetCoreCsvImportExport.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(DummyData());
+            return Ok(DummyDataSimple());
         }
 
         [HttpGet]
@@ -19,10 +19,34 @@ namespace AspNetCoreCsvImportExport.Controllers
         [Produces("text/csv")]
         public IActionResult GetDataAsCsv()
         {
-            return Ok( DummyData());
+            return Ok(DummyDataSimple());
         }
 
-        private static IEnumerable<LocalizationRecord> DummyData()
+        [HttpGet]
+        [Route("datacomplex.csv")]
+        [Produces("text/csv")]
+        public IActionResult GetComplexDataAsCsv()
+        {
+            return Ok(DummyDataComplex());
+        }
+
+        // POST api/csvtest/import
+        [HttpPost]
+        [Route("import")]
+        public IActionResult Import([FromBody]List<LocalizationRecord> value)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            else
+            {
+                List<LocalizationRecord> data = value;
+                return Ok();
+            }
+        }
+
+        private static IEnumerable<LocalizationRecord> DummyDataSimple()
         {
             var model = new List<LocalizationRecord>
             {
@@ -48,21 +72,40 @@ namespace AspNetCoreCsvImportExport.Controllers
 
             return model;
         }
-
-        // POST api/csvtest/import
-        [HttpPost]
-        [Route("import")]
-        public IActionResult Import([FromBody]List<LocalizationRecord> value)
+        private static IEnumerable<LocalizationRecord> DummyDataComplex()
         {
-            if (!ModelState.IsValid)
+            var model = new List<LocalizationRecord>
             {
-                return BadRequest(ModelState);
-            }
-            else
-            {
-                List<LocalizationRecord> data = value;
-                return Ok();
-            }
+                new LocalizationRecord
+                {
+                    Id = 1,
+                    Key = "test",
+                    Text = "test text",
+                    LocalizationCulture = "en-US",
+                    ResourceKey = "test"
+
+                },
+                new LocalizationRecord
+                {
+                    Id = 2,
+                    Key = "test",
+                    Text = "test2 öäüéàè text de-CH",
+                    LocalizationCulture = "de-CH",
+                    ResourceKey = "test"
+
+                },
+                new LocalizationRecord
+                {
+                    Id = 3,
+                    Key = "test3",
+                    Text = "test2 öäüéàè text de-CH, it-CH, en-US",
+                    LocalizationCulture = "de-CH",
+                    ResourceKey = "test"
+
+                }
+            };
+
+            return model;
         }
 
     }
