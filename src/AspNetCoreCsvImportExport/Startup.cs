@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
+using Swashbuckle.AspNetCore.Swagger;
 using System.Linq;
 
 namespace AspNetCoreCsvImportExport
@@ -36,6 +37,17 @@ namespace AspNetCoreCsvImportExport
                 options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "text/csv" });
             });
 
+            // Register the Swagger generator, defining 1 or more Swagger documents
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info
+                {
+                    Version = "v1",
+                    Title = "CSV TEST API",
+                });
+
+            });
+
             services.AddMvc(options =>
             {
                 options.InputFormatters.Add(new CsvInputFormatter(csvFormatterOptions));
@@ -53,6 +65,14 @@ namespace AspNetCoreCsvImportExport
             app.UseStaticFiles();
 
             app.UseMvc();
+
+
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "CSV Test API V1");
+            });
         }
     }
 }
