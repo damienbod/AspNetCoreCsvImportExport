@@ -80,7 +80,7 @@ namespace AspNetCoreCsvImportExport.Formatters
                 itemType = type.GetElementType();
             }
 
-            var streamWriter = new StreamWriter(response.Body, Encoding.GetEncoding(_options.Encoding));
+            var streamWriter = new StreamWriter(response.Body, _options.Encoding);
 
             if (_options.IncludeExcelDelimiterHeader)
             {

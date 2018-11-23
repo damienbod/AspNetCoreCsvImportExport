@@ -1,4 +1,6 @@
-﻿namespace AspNetCoreCsvImportExport.Formatters
+﻿using System.Text;
+
+namespace AspNetCoreCsvImportExport.Formatters
 {
     public class CsvFormatterOptions
     {
@@ -6,7 +8,7 @@
 
         public string CsvDelimiter { get; set; } = ";";
 
-        public string Encoding { get; set; } = "ISO-8859-1";
+        public Encoding Encoding { get; set; } = Encoding.Default;
 
         public bool IncludeExcelDelimiterHeader { get; set; } = false;
     }
